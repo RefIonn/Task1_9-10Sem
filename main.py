@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtGui import QPainter, QBrush, QPen, QPolygon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt
 
 
@@ -12,10 +12,13 @@ class Window(QMainWindow):
         self.button_1 = QtWidgets.QPushButton(self)
         self.button_2 = QtWidgets.QPushButton(self)
         self.button_3 = QtWidgets.QPushButton(self)
+        self.button_4 = QtWidgets.QPushButton(self)
         self.comboBox_1 = QtWidgets.QComboBox(self)
         self.comboBox_2 = QtWidgets.QComboBox(self)
         self.text1 = QtWidgets.QLabel(self)
         self.text2 = QtWidgets.QLabel(self)
+
+        self.draw = False
 
         self.title = "PyQt5 Figure"
         self.x = 450
@@ -32,6 +35,8 @@ class Window(QMainWindow):
         self.text_2()
         self.button2()
         self.button3()
+        self.button4()
+        self.cancel()
 
     def window(self):
         self.setWindowTitle(self.title)
@@ -72,7 +77,7 @@ class Window(QMainWindow):
         self.comboBox_2.addItem("")
         self.comboBox_2.addItem("")
         self.comboBox_2.setItemText(0, "Чёрный")
-        self.comboBox_2.setItemText(1, "Фиолетовый")
+        self.comboBox_2.setItemText(1, "Пурпурный")
         self.comboBox_2.setItemText(2, "Красный")
         self.comboBox_2.setItemText(3, "Синий")
 
@@ -92,15 +97,87 @@ class Window(QMainWindow):
         self.comboBox_2.setEnabled(False)
 
     def button3(self):
-        self.button_3.setText("Начать рисовать!")
+        self.button_3.setText('Нарисовать')
         self.button_3.move(180, 160)
         self.button_3.adjustSize()
         self.button_3.clicked.connect(self.button_and_combobox_1_enabled)
         self.button_3.clicked.connect(self.button_and_combobox_2_enabled)
         self.button_3.clicked.connect(self.button_3_clicked)
+        self.button_3.clicked.connect(self.figure_draw)
+        self.button_3.clicked.connect(self.button4)
+        self.button_3.clicked.connect(self.button_4_clicked)
 
     def button_3_clicked(self):
         self.button_3.setEnabled(False)
+
+    def figure_draw(self):
+        self.draw = True
+        self.update()
+
+    def figure_erase(self):
+        self.draw = False
+        self.update()
+
+    def paintEvent(self, event):
+        figure_name = self.comboBox_1.currentText()
+        color_name = self.comboBox_2.currentText()
+        painter = QPainter(self)
+        if self.draw:
+            if color_name == "Чёрный":
+                color = Qt.black
+            elif color_name == "Пурпурный":
+                color = Qt.magenta
+            elif color_name == "Красный":
+                color = Qt.red
+            elif color_name == "Синий":
+                color = Qt.blue
+            if figure_name == "Квадрат":
+                pen = QPen(color)
+                pen.setWidth(3)
+                pen.setStyle(Qt.SolidLine)
+                painter.setPen(pen)
+
+                painter.drawRect(120, 200, 200, 200)
+            elif figure_name == "Круг":
+                pen = QPen(color)
+                pen.setWidth(3)
+                pen.setStyle(Qt.SolidLine)
+                painter.setPen(pen)
+
+                painter.drawEllipse(120, 200, 200, 200)
+            elif figure_name == "Треугольник":
+                pen = QPen(color)
+                pen.setWidth(3)
+                pen.setStyle(Qt.SolidLine)
+                painter.setPen(pen)
+
+                painter.drawLine(300, 300, 220, 200)
+                painter.drawLine(220, 200, 150, 300)
+                painter.drawLine(150, 300, 300, 300)
+            elif figure_name == "Прямоугольник":
+                pen = QPen(color)
+                pen.setWidth(3)
+                pen.setStyle(Qt.SolidLine)
+                painter.setPen(pen)
+
+                painter.drawRect(70, 200, 300, 200)
+
+    def button4(self):
+        self.button_4.setText('Отмена')
+        self.button_4.move(350, 500)
+        self.button_4.clicked.connect(self.cancel)
+
+    def cancel(self):
+        self.button_1.setEnabled(True)
+        self.button_2.setEnabled(True)
+        self.button_3.setEnabled(True)
+        self.button_4.setEnabled(False)
+        self.comboBox_1.setEnabled(True)
+        self.comboBox_2.setEnabled(True)
+
+    def button_4_clicked(self):
+        self.button_4.setEnabled(True)
+        self.button_4.clicked.connect(self.figure_erase)
 
 
 def application():
